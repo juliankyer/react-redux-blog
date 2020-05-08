@@ -1,24 +1,18 @@
 import React, { Component } from "react";
 import GenreCard from "./GenreCard";
 import "./GenreList.css";
-import genreService from "../services/genreService";
+import { connect } from "react-redux";
+import { fetchGenres } from "../redux/actions";
 
 class GenreList extends Component {
-  state = {
-    genres: [],
-  };
-
   componentDidMount() {
-    genreService
-      .getGenres()
-      .then((res) => this.setState({ genres: res.data }))
-      .catch((error) => console.log("There was an error", error));
+    this.props.fetchGenres();
   }
 
   render() {
     return (
       <div className="genre-list">
-        {this.state.genres.map((genre) => (
+        {this.props.genres.map((genre) => (
           <GenreCard genre={genre} key={genre.id} />
         ))}
       </div>
@@ -26,4 +20,20 @@ class GenreList extends Component {
   }
 }
 
-export default GenreList;
+GenreList.defaultProps = {
+  genres: [],
+};
+
+const mapStateToProps = (state) => {
+  return {
+    genres: state.genres.data,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchGenres: () => dispatch(fetchGenres()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(GenreList);
